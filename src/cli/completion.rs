@@ -1,5 +1,4 @@
 use rustyline::completion::Completer;
-use rustyline::completion::longest_common_prefix;
 use rustyline::error::ReadlineError;
 
 pub struct CommandCompleter {}
@@ -21,23 +20,16 @@ impl Completer for CommandCompleter {
     fn complete(&self, line: &str, _pos: usize) -> Result<(usize, Vec<String>), ReadlineError> {
         let commands = &CommandCompleter::commands();
 
-        // Some common prefix of our commands starts with input, show those commands
-        // as completion candidates.
-        if let Some(prefix) = longest_common_prefix(commands) {
-            if prefix.starts_with(line) {
-                return Ok((0, commands.clone()));
-            }
-        }
+        // First we filter out those commands which actually start with the input.
+        let candidates: Vec<String> = commands.iter()
+            .filter(|c| c.starts_with(line))
+            .map(|c| c.clone())
+            .collect();
 
-        // No common prefix starts with the input, See if any actual command starts with
-        // the user input. If so return just that one command as candidate.
-        for command in commands {
-            if command.starts_with(line) {
-                return Ok((0, vec![command.to_owned()]));
-            }
+        if candidates.is_empty() {
+            Ok((0, vec![]))
+        } else {
+            Ok((0, candidates.clone()))
         }
-
-        // Matched nothing
-        Ok((0, vec![]))
     }
 }
