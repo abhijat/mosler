@@ -6,7 +6,11 @@ pub struct CommandCompleter {}
 
 impl CommandCompleter {
     pub fn commands() -> Vec<String> {
-        vec!["ls-policies".to_owned(), "ls-approles".to_owned()]
+        vec![
+            "ls-policies".to_owned(),
+            "ls-approles".to_owned(),
+            "read-policy".to_owned()
+        ]
     }
 }
 

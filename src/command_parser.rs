@@ -1,9 +1,11 @@
-use std::collections::HashMap;
-use http_utils::http_get;
-
 use colored::*;
-use reqwest::Error;
 use http_utils::http_custom;
+use http_utils::http_get;
+use json_utils::key_from_object;
+use json_utils::str_from_object;
+use reqwest::Error;
+use serde_json::Value;
+use std::collections::HashMap;
 
 #[derive(Debug, Deserialize)]
 struct Policies {
@@ -40,7 +42,7 @@ pub fn get_policies() -> String {
 }
 
 pub fn get_approles() -> String {
-    let response = http_custom("auth/approle/role", ROOT_TOKEN);
+    let response = http_custom("auth/approle/role", ROOT_TOKEN, "LIST");
 
     match response {
         Ok(mut r) => {
@@ -54,11 +56,40 @@ pub fn get_approles() -> String {
     }
 }
 
-pub fn parse_command(command: &str) -> String {
+pub fn read_policy(policy_name: &str) -> String {
+    let path = format!("sys/policy/{}", policy_name);
+    let response = http_get(&path, ROOT_TOKEN);
 
+    match response {
+        Ok(mut r) => {
+            let v: Value = r.json().unwrap();
+            let data = key_from_object(&v, "data");
+            format!(
+                "name: {:#} rules: {:#}",
+                str_from_object(data, "name"),
+                str_from_object(data, "rules")
+            )
+        }
+
+        Err(e) => {
+            format_error(e)
+        }
+    }
+}
+
+pub fn parse_command(command: &str) -> String {
     match command {
         "ls-policies" => get_policies(),
         "ls-approles" => get_approles(),
+        s if s.starts_with("read-policy") => {
+            let tokens: Vec<&str> = s.split_whitespace().collect();
+
+            if tokens.len() != 2 {
+                "invalid command".to_owned()
+            } else {
+                read_policy(tokens.get(1).unwrap())
+            }
+        }
         _ => "unknown command!".to_owned()
     }
 }

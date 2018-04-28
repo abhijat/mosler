@@ -31,11 +31,11 @@ pub fn http_get(path: &str, token: &str) -> Result<Response, Error> {
     }
 }
 
-pub fn http_custom(path: &str, token: &str) -> Result<Response, Error> {
+pub fn http_custom(path: &str, token: &str, method_type: &str) -> Result<Response, Error> {
 
     let path = format!("{}/{}", SERVER_URL, path);
 
-    let method = Extension("LIST".to_string());
+    let method = Extension(method_type.to_string());
     let url = Url::parse(&path).unwrap();
 
     let response = Client::new()
