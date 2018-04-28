@@ -1,6 +1,6 @@
 use colored::*;
-use http_utils::VaultHTTPClient;
-use json_utils::JsonExtractor;
+use vault_http_client::VaultHTTPClient;
+use json_extractor::JsonExtractor;
 use reqwest::Error;
 use serde_json::Value;
 

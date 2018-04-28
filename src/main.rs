@@ -5,13 +5,13 @@ extern crate serde_json;
 
 use auth_context::ContextBuilder;
 use vault_api::VaultApi;
-use http_utils::VaultHTTPClient;
+use vault_http_client::VaultHTTPClient;
 
 mod shell;
-mod command_parser;
+mod command_handlers;
 mod command_completer;
-mod http_utils;
-mod json_utils;
+mod vault_http_client;
+mod json_extractor;
 mod auth_context;
 mod vault_api;
 

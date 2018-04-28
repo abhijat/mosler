@@ -1,4 +1,4 @@
-use ::command_parser::command_router;
+use ::command_handlers::command_router;
 use command_completer::CommandCompleter;
 use rustyline::config::{Builder, CompletionType};
 use rustyline::error::ReadlineError;
@@ -50,6 +50,6 @@ pub fn shell(api: VaultApi) {
         }
     }
 
-    rl.save_history(".mosler_history").unwrap();
+    rl.save_history(".mosler_history").expect("failed to save history");
 }
 
