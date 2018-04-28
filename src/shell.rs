@@ -1,4 +1,4 @@
-use ::command_parser::parse_command;
+use ::command_parser::command_router;
 use command_completer::CommandCompleter;
 use rustyline::config::{Builder, CompletionType};
 use rustyline::error::ReadlineError;
@@ -21,7 +21,7 @@ pub fn shell() {
             Ok(s) => {
                 if !s.is_empty() {
                     rl.add_history_entry(s.clone());
-                    let response = parse_command(&s);
+                    let response = command_router(&s);
                     println!("{}", response);
                 }
             }

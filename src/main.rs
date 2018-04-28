@@ -1,10 +1,6 @@
-extern crate rustyline;
-extern crate reqwest;
-
-#[macro_use]
-extern crate serde_derive;
-
 extern crate colored;
+extern crate reqwest;
+extern crate rustyline;
 extern crate serde_json;
 
 mod shell;
