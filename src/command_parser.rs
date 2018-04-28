@@ -3,6 +3,7 @@ use http_utils::{http_custom, http_get};
 use json_utils::JsonExtractor;
 use reqwest::Error;
 use serde_json::Value;
+use vault_api::VaultApi;
 
 static ROOT_TOKEN: &str = "2db7ef2c-7449-35a7-7412-4a1018c82a7a";
 
@@ -66,7 +67,7 @@ pub fn read_policy(policy_name: &str) -> String {
     }
 }
 
-fn route_command_with_args(command: &str) -> String {
+fn route_command_with_args(api: &VaultApi, command: &str) -> String {
     let tokens: Vec<&str> = command.split_whitespace().collect();
 
     if tokens.len() < 2 {
@@ -74,17 +75,17 @@ fn route_command_with_args(command: &str) -> String {
     }
 
     match tokens[0] {
-        "read-policy" => read_policy(tokens[1]),
+        "read-policy" => api.read_policy(tokens[1]),
         _ => "unknown command".to_owned()
     }
 }
 
-pub fn command_router(command: &str) -> String {
+pub fn command_router(api: &VaultApi, command: &str) -> String {
     match command {
-        "ls-policies" => get_policies(),
-        "ls-approles" => get_app_roles(),
+        "ls-policies" => api.get_policies(),
+        "ls-approles" => api.get_app_roles(),
         s if s.contains(" ") => {
-            route_command_with_args(s)
+            route_command_with_args(&api, s)
         }
         _ => "unknown command!".to_owned()
     }
