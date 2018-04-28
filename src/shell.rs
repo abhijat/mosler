@@ -1,9 +1,9 @@
 use ::command_handlers::command_router;
 use command_completer::CommandCompleter;
 use rustyline::config::{Builder, CompletionType};
-use rustyline::error::ReadlineError;
 use rustyline::Editor;
-use vault_api::VaultApi;
+use rustyline::error::ReadlineError;
+use vault::api::VaultApi;
 
 fn init_readline() -> Editor<CommandCompleter> {
     let builder = Builder::new()
@@ -20,7 +20,6 @@ fn init_readline() -> Editor<CommandCompleter> {
 }
 
 pub fn shell(api: VaultApi) {
-
     let mut rl = init_readline();
 
     loop {

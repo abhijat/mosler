@@ -1,4 +1,4 @@
-use vault_api::VaultApi;
+use vault::api::VaultApi;
 
 fn route_command_with_args(api: &VaultApi, command: &str) -> String {
     let tokens: Vec<&str> = command.split_whitespace().collect();

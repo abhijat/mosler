@@ -1,8 +1,8 @@
 use colored::*;
-use vault_http_client::VaultHTTPClient;
 use json_extractor::JsonExtractor;
 use reqwest::Error;
 use serde_json::Value;
+use vault::http_client::VaultHTTPClient;
 
 #[derive(Debug)]
 pub struct VaultApi {

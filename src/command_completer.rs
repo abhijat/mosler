@@ -15,12 +15,10 @@ impl CommandCompleter {
 }
 
 impl Completer for CommandCompleter {
-
     // In this function we handle command completion. We check if the user input matches
     // one of our pre-defined commands. Here 'matches' means the command starts with the
     // input. This is mostly brute force and not very elegant for now.
     fn complete(&self, line: &str, _pos: usize) -> Result<(usize, Vec<String>), ReadlineError> {
-
         let commands = &CommandCompleter::commands();
 
         // Some common prefix of our commands starts with input, show those commands
@@ -41,6 +39,5 @@ impl Completer for CommandCompleter {
 
         // Matched nothing
         Ok((0, vec![]))
-
     }
 }
