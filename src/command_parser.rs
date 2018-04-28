@@ -3,6 +3,7 @@ use http_utils::http_get;
 
 use colored::*;
 use reqwest::Error;
+use http_utils::http_custom;
 
 #[derive(Debug, Deserialize)]
 struct Policies {
@@ -14,7 +15,7 @@ struct AppRoles {
     data: HashMap<String, Vec<String>>
 }
 
-static ROOT_TOKEN: &str = "648325b0-7de4-59d3-8541-9fc103bd5b0e";
+static ROOT_TOKEN: &str = "2db7ef2c-7449-35a7-7412-4a1018c82a7a";
 
 fn format_error(e: Error) -> String {
     e.to_string()
@@ -24,7 +25,7 @@ fn format_error(e: Error) -> String {
 }
 
 pub fn get_policies() -> String {
-    let response = http_get("/sys/policy", ROOT_TOKEN);
+    let response = http_get("sys/policy", ROOT_TOKEN);
 
     match response {
         Ok(mut r) => {
@@ -39,12 +40,12 @@ pub fn get_policies() -> String {
 }
 
 pub fn get_approles() -> String {
-    let response = http_get("/auth/approle/role", ROOT_TOKEN);
+    let response = http_custom("auth/approle/role", ROOT_TOKEN);
 
     match response {
         Ok(mut r) => {
             let approles: AppRoles = r.json().unwrap();
-            format!("{:?}", approles)
+            format!("{:?}", approles.data.get("keys").unwrap())
         }
 
         Err(e) => {

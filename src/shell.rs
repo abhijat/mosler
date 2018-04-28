@@ -16,7 +16,7 @@ pub fn shell() {
     }
 
     loop {
-        let input = rl.readline("[the shell!] $ ");
+        let input = rl.readline("[mosler] $ ");
         match input {
             Ok(s) => {
                 if !s.is_empty() {
