@@ -6,13 +6,11 @@ extern crate serde_json;
 use vault::api::VaultApi;
 use vault::http_client::VaultHTTPClient;
 use vault::auth_context::ContextBuilder;
-use foo::do_this;
 
 mod shell;
-mod command_handlers;
-mod command_completer;
 mod json_extractor;
 mod vault;
+mod cli;
 
 fn main() {
     let ctx = ContextBuilder::new()

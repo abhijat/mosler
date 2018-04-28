@@ -1,5 +1,5 @@
-use ::command_handlers::command_router;
-use command_completer::CommandCompleter;
+use cli::routing::command_router;
+use cli::completion::CommandCompleter;
 use rustyline::config::{Builder, CompletionType};
 use rustyline::Editor;
 use rustyline::error::ReadlineError;
