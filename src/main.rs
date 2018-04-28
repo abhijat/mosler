@@ -3,15 +3,15 @@ extern crate reqwest;
 extern crate rustyline;
 extern crate serde_json;
 
-use auth_context::ContextBuilder;
 use vault::api::VaultApi;
 use vault::http_client::VaultHTTPClient;
+use vault::auth_context::ContextBuilder;
+use foo::do_this;
 
 mod shell;
 mod command_handlers;
 mod command_completer;
 mod json_extractor;
-mod auth_context;
 mod vault;
 
 fn main() {

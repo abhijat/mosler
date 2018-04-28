@@ -1,7 +1,7 @@
-use auth_context::AuthContext;
 use reqwest::{Client, Error, Response, StatusCode, Url};
 use reqwest::header::{ContentType, Headers};
 use reqwest::Method::Extension;
+use vault::auth_context::AuthContext;
 
 #[derive(Debug)]
 pub struct VaultHTTPClient {
