@@ -1,34 +1,64 @@
 use std::collections::HashMap;
-use reqwest::header::Headers;
-use reqwest::Client;
-use reqwest::header::ContentType;
+use http_utils::http_get;
+
+use colored::*;
+use reqwest::Error;
 
 #[derive(Debug, Deserialize)]
 struct Policies {
     data: HashMap<String, Vec<String>>
 }
 
+#[derive(Debug, Deserialize)]
+struct AppRoles {
+    data: HashMap<String, Vec<String>>
+}
+
+static ROOT_TOKEN: &str = "648325b0-7de4-59d3-8541-9fc103bd5b0e";
+
+fn format_error(e: Error) -> String {
+    e.to_string()
+        .red()
+        .bold()
+        .to_string()
+}
+
 pub fn get_policies() -> String {
-    let client = Client::new();
+    let response = http_get("/sys/policy", ROOT_TOKEN);
 
-    let mut headers = Headers::new();
+    match response {
+        Ok(mut r) => {
+            let policies: Policies = r.json().unwrap();
+            format!("{:?}", policies.data.get("policies").unwrap())
+        }
 
-    headers.set_raw("X-Vault-Token", "8acd0b34-a220-bfd3-de8d-7fc2ab05c22c");
-    headers.set(ContentType::json());
+        Err(e) => {
+            format_error(e)
+        }
+    }
+}
 
-    let mut response = client.get("http://localhost:8200/v1/sys/policy")
-        .headers(headers)
-        .send()
-        .unwrap();
+pub fn get_approles() -> String {
+    let response = http_get("/auth/approle/role", ROOT_TOKEN);
 
-    let response: Policies = response.json().unwrap();
-    format!("{:?}", response.data.get("policies").unwrap())
+    match response {
+        Ok(mut r) => {
+            let approles: AppRoles = r.json().unwrap();
+            format!("{:?}", approles)
+        }
+
+        Err(e) => {
+            format_error(e)
+        }
+    }
 }
 
 pub fn parse_command(command: &str) -> String {
-    if command == "ls-policies" {
-        get_policies()
-    } else {
-        "unknown command!".to_owned()
+
+    match command {
+        "ls-policies" => get_policies(),
+        "ls-approles" => get_approles(),
+        "" => String::new(),
+        _ => "unknown command!".to_owned()
     }
 }

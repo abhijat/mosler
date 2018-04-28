@@ -15,7 +15,7 @@ impl Completer for CommandCompleter {
     // In this function we handle command completion. We check if the user input matches
     // one of our pre-defined commands. Here 'matches' means the command starts with the
     // input. This is mostly brute force and not very elegant for now.
-    fn complete(&self, line: &str, pos: usize) -> Result<(usize, Vec<String>), ReadlineError> {
+    fn complete(&self, line: &str, _pos: usize) -> Result<(usize, Vec<String>), ReadlineError> {
 
         let commands = &CommandCompleter::commands();
 
