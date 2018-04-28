@@ -19,9 +19,11 @@ pub fn shell() {
         let input = rl.readline("[the shell!] $ ");
         match input {
             Ok(s) => {
-                rl.add_history_entry(s.clone());
-                let response = parse_command(&s);
-                println!("{}", response);
+                if !s.is_empty() {
+                    rl.add_history_entry(s.clone());
+                    let response = parse_command(&s);
+                    println!("{}", response);
+                }
             }
 
             Err(ReadlineError::Interrupted) => {

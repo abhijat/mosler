@@ -58,7 +58,6 @@ pub fn parse_command(command: &str) -> String {
     match command {
         "ls-policies" => get_policies(),
         "ls-approles" => get_approles(),
-        "" => String::new(),
         _ => "unknown command!".to_owned()
     }
 }
