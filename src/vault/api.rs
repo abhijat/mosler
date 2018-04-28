@@ -1,8 +1,9 @@
-use colored::*;
 use json_extractor::JsonExtractor;
-use reqwest::Error;
 use serde_json::Value;
 use vault::http_client::VaultHTTPClient;
+use term_painter::Painted;
+use cli::colors::paint_error;
+use cli::colors::paint_success;
 
 #[derive(Debug)]
 pub struct VaultApi {
@@ -14,60 +15,56 @@ impl VaultApi {
         VaultApi { http_client: client }
     }
 
-    pub fn get_policies(&self) -> String {
+    pub fn get_policies(&self) -> Painted<String> {
         let response = self.http_client.get("sys/policy");
 
         match response {
             Ok(mut r) => {
                 let v: Value = r.json().unwrap();
-                format!("{:#}", JsonExtractor::new(&v)
+                paint_success(format!("{:#}", JsonExtractor::new(&v)
                     .get_value("data")
                     .get_value("policies")
-                    .value_ref)
+                    .value_ref))
             }
 
             Err(e) => {
-                format_error(e)
+                paint_error(e.to_string())
             }
         }
     }
 
-    pub fn get_app_roles(&self) -> String {
+    pub fn get_app_roles(&self) -> Painted<String> {
         let response = self.http_client.method("auth/approle/role", "LIST");
 
         match response {
             Ok(mut r) => {
                 let v: Value = r.json().unwrap();
-                format!("{:#}", JsonExtractor::new(&v)
+                paint_success(format!("{:#}", JsonExtractor::new(&v)
                     .get_value("data")
-                    .get_str("keys"))
+                    .get_str("keys")))
             }
 
             Err(e) => {
-                format_error(e)
+                paint_error(e.to_string())
             }
         }
     }
 
-    pub fn read_policy(&self, policy_name: &str) -> String {
+    pub fn read_policy(&self, policy_name: &str) -> Painted<String> {
         let path = format!("sys/policy/{}", policy_name);
         let response = self.http_client.get(&path);
 
         match response {
             Ok(mut r) => {
                 let v: Value = r.json().unwrap();
-                format!("rules: {:#}", JsonExtractor::new(&v)
+                paint_success(format!("rules: {:#}", JsonExtractor::new(&v)
                     .get_value("data")
-                    .get_str("rules"))
+                    .get_str("rules")))
             }
 
             Err(e) => {
-                format_error(e)
+                paint_error(e.to_string())
             }
         }
     }
-}
-
-fn format_error(e: Error) -> String {
-    e.to_string().red().bold().to_string()
 }

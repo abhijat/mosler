@@ -19,5 +19,5 @@ Commands that work right now:
 
 * rustyline (for the repl, tab completion, history etc)
 * reqwest (for sending requests to the vault server over HTTP)
-* colors (for encoding error output)
+* term_painter (for encoding error output)
 * serde (for json operations)
