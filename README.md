@@ -8,9 +8,12 @@ The auth token will be cached for the login session and will be used to communic
 
 <br>
 
-Right now only the ls-policies command works. More query commands are being added.
+Commands that work right now:
 
-<br>
+* ls-policies
+* ls-approles
+* read-policy <policy-name>
+
 
 ##### Dependencies
 
