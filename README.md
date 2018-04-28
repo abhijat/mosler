@@ -1,6 +1,6 @@
 ### Mosler is a shell for Hashicorp vault
 
-It is in *very* early stages of development.
+It is in early stages of development.
 
 The goal is to be able to login once when starting mosler, and then run commands which perform operations using the vault HTTP api. 
 

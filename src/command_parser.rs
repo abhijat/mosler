@@ -19,7 +19,7 @@ pub fn get_policies() -> String {
     match response {
         Ok(mut r) => {
             let v: Value = r.json().unwrap();
-            format!("{}", JsonExtractor::new(&v)
+            format!("{:#}", JsonExtractor::new(&v)
                 .get_value("data")
                 .get_value("policies")
                 .value_ref)
@@ -37,7 +37,7 @@ pub fn get_app_roles() -> String {
     match response {
         Ok(mut r) => {
             let v: Value = r.json().unwrap();
-            format!("{:?}", JsonExtractor::new(&v)
+            format!("{:#}", JsonExtractor::new(&v)
                 .get_value("data")
                 .get_str("keys"))
         }
