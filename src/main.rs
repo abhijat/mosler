@@ -14,9 +14,22 @@ mod vault;
 mod cli;
 
 fn main() {
+
+    // TODO build up context from cmdline input
+    // TODO research terminal input libs
+
+    let args: Vec<String> = std::env::args().skip(1).collect();
+
+    if args.len() != 1 {
+        println!("usage: mosler <token>");
+        std::process::exit(1);
+    }
+
+    let token = &args[0];
+
     let ctx = ContextBuilder::new()
         .server_address("http://localhost:8200/v1")
-        .auth_token("2fdffa86-fb08-a54e-bdfd-3f5bfc63bc92")
+        .auth_token(token)
         .build();
 
     let client = VaultHTTPClient::new(ctx);
