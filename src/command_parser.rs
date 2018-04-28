@@ -66,18 +66,25 @@ pub fn read_policy(policy_name: &str) -> String {
     }
 }
 
+fn route_command_with_args(command: &str) -> String {
+    let tokens: Vec<&str> = command.split_whitespace().collect();
+
+    if tokens.len() < 2 {
+        return "invalid command".to_owned();
+    }
+
+    match tokens[0] {
+        "read-policy" => read_policy(tokens[1]),
+        _ => "unknown command".to_owned()
+    }
+}
+
 pub fn command_router(command: &str) -> String {
     match command {
         "ls-policies" => get_policies(),
         "ls-approles" => get_app_roles(),
-        s if s.starts_with("read-policy") => {
-            let tokens: Vec<&str> = s.split_whitespace().collect();
-
-            if tokens.len() != 2 {
-                "invalid command".to_owned()
-            } else {
-                read_policy(tokens.get(1).unwrap())
-            }
+        s if s.contains(" ") => {
+            route_command_with_args(s)
         }
         _ => "unknown command!".to_owned()
     }
