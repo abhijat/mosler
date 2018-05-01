@@ -1,11 +1,12 @@
-use reqwest::{Client, Error, Response, StatusCode, Url};
+use errors::ErrorKind;
+use reqwest::{Client, Response, Url};
 use reqwest::header::{ContentType, Headers};
 use reqwest::Method::Extension;
 use vault::auth_context::AuthContext;
 
 #[derive(Debug)]
 pub struct VaultHTTPClient {
-    auth_context: AuthContext
+    pub auth_context: AuthContext
 }
 
 impl VaultHTTPClient {
@@ -16,8 +17,11 @@ impl VaultHTTPClient {
     }
 
     fn normalize(&self, p: &str) -> String {
-        // TODO strip off extra slashes here
-        format!("{}/{}", self.auth_context.server_address, p)
+        if p.starts_with("/") {
+            format!("{}{}", self.auth_context.server_address, p)
+        } else {
+            format!("{}{}", self.auth_context.server_address, p)
+        }
     }
 
     fn auth_header(&self) -> Headers {
@@ -27,33 +31,32 @@ impl VaultHTTPClient {
         headers
     }
 
-    pub fn get(&self, path: &str) -> Result<Response, Error> {
-        let client = Client::new();
-        let response = client.get(&self.normalize(path))
+    pub fn get(&self, path: &str) -> Result<Response, ErrorKind> {
+        Client::new()
+            .get(&self.normalize(path))
             .headers(self.auth_header())
             .send()
-            .unwrap();
-
-        self.map_response(response)
+            .map_err(ErrorKind::ReqwestError)
+            .and_then(ErrorKind::map_http_code)
     }
 
-    pub fn method(&self, path: &str, method_type: &str) -> Result<Response, Error> {
+    pub fn method(&self, path: &str, method_type: &str) -> Result<Response, ErrorKind> {
         let method = Extension(method_type.to_string());
-        let url = Url::parse(&self.normalize(path)).unwrap();
+        let path = self.normalize(path);
 
-        let response = Client::new()
-            .request(method, url)
-            .headers(self.auth_header())
-            .send()
-            .unwrap();
+        match Url::parse(&path) {
+            Ok(url) => {
+                Client::new()
+                    .request(method, url)
+                    .headers(self.auth_header())
+                    .send()
+                    .map_err(ErrorKind::ReqwestError)
+                    .and_then(ErrorKind::map_http_code)
+            }
 
-        self.map_response(response)
-    }
-
-    fn map_response(&self, r: Response) -> Result<Response, Error> {
-        match r.status() {
-            StatusCode::Ok => Ok(r),
-            _ => r.error_for_status(),
+            Err(err) => {
+                Err(ErrorKind::UrlParseError(err))
+            }
         }
     }
 }

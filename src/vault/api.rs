@@ -15,6 +15,19 @@ impl VaultApi {
         VaultApi { http_client: client }
     }
 
+    pub fn probe(&self) -> Result<String, String> {
+        match self.http_client.get("sys/health") {
+            Ok(mut r) => {
+                let v: Value = r.json().unwrap();
+                Ok(format!("{:#}", v))
+            }
+            Err(e) => {
+                Err(e.to_string())
+            }
+        }
+
+    }
+
     pub fn get_policies(&self) -> Painted<String> {
         let response = self.http_client.get("sys/policy");
 
