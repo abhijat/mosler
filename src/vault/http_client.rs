@@ -20,7 +20,7 @@ impl VaultHTTPClient {
         if p.starts_with("/") {
             format!("{}{}", self.auth_context.server_address, p)
         } else {
-            format!("{}{}", self.auth_context.server_address, p)
+            format!("{}/{}", self.auth_context.server_address, p)
         }
     }
 
