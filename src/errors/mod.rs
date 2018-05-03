@@ -12,8 +12,7 @@ impl Error {
     pub fn map_http_code(r: Response) -> Result<Response, Error> {
         match r.status() {
             StatusCode::Ok => Ok(r),
-            _ => r.error_for_status()
-                .map_err(|e| Error::HttpRequestError(e)),
+            _ => r.error_for_status().map_err(Error::HttpRequestError)
         }
     }
 }

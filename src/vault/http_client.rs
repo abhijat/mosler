@@ -9,6 +9,8 @@ pub struct VaultHTTPClient {
     pub auth_context: AuthContext
 }
 
+type Result<T> = ::std::result::Result<T, Error>;
+
 impl VaultHTTPClient {
     pub fn new(ctx: AuthContext) -> Self {
         VaultHTTPClient {
@@ -31,16 +33,16 @@ impl VaultHTTPClient {
         headers
     }
 
-    pub fn get(&self, path: &str) -> Result<Response, Error> {
-        Client::new()
+    pub fn get(&self, path: &str) -> Result<Response> {
+        let response = Client::new()
             .get(&self.normalize(path))
             .headers(self.auth_header())
-            .send()
-            .map_err(Error::HttpRequestError)
-            .and_then(Error::map_http_code)
+            .send()?;
+
+        Error::map_http_code(response)
     }
 
-    pub fn method(&self, path: &str, method_type: &str) -> Result<Response, Error> {
+    pub fn method(&self, path: &str, method_type: &str) -> Result<Response> {
         let method = Extension(method_type.to_string());
         let path = self.normalize(path);
 
