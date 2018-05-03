@@ -1,4 +1,4 @@
-use errors::ErrorKind;
+use errors::Error;
 use reqwest::{Client, Response, Url};
 use reqwest::header::{ContentType, Headers};
 use reqwest::Method::Extension;
@@ -31,32 +31,25 @@ impl VaultHTTPClient {
         headers
     }
 
-    pub fn get(&self, path: &str) -> Result<Response, ErrorKind> {
+    pub fn get(&self, path: &str) -> Result<Response, Error> {
         Client::new()
             .get(&self.normalize(path))
             .headers(self.auth_header())
             .send()
-            .map_err(ErrorKind::ReqwestError)
-            .and_then(ErrorKind::map_http_code)
+            .map_err(Error::HttpRequestError)
+            .and_then(Error::map_http_code)
     }
 
-    pub fn method(&self, path: &str, method_type: &str) -> Result<Response, ErrorKind> {
+    pub fn method(&self, path: &str, method_type: &str) -> Result<Response, Error> {
         let method = Extension(method_type.to_string());
         let path = self.normalize(path);
 
-        match Url::parse(&path) {
-            Ok(url) => {
-                Client::new()
-                    .request(method, url)
-                    .headers(self.auth_header())
-                    .send()
-                    .map_err(ErrorKind::ReqwestError)
-                    .and_then(ErrorKind::map_http_code)
-            }
+        let url = Url::parse(&path)?;
+        let response = Client::new()
+            .request(method, url)
+            .headers(self.auth_header())
+            .send()?;
 
-            Err(err) => {
-                Err(ErrorKind::UrlParseError(err))
-            }
-        }
+        Error::map_http_code(response)
     }
 }
