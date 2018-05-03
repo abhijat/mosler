@@ -19,6 +19,7 @@ pub fn command_router(api: &VaultApi, command: &str) -> Painted<String> {
     match command {
         "ls-policies" => api.get_policies(),
         "ls-approles" => api.get_app_roles(),
+        "enable-approle" => api.enable_approle(),
         s if s.contains(" ") => {
             route_command_with_args(&api, s)
         }

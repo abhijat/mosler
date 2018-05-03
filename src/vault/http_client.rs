@@ -3,6 +3,7 @@ use reqwest::{Client, Response, Url};
 use reqwest::header::{ContentType, Headers};
 use reqwest::Method::Extension;
 use vault::auth_context::AuthContext;
+use serde_json::Value;
 
 #[derive(Debug)]
 pub struct VaultHTTPClient {
@@ -37,6 +38,16 @@ impl VaultHTTPClient {
         let response = Client::new()
             .get(&self.normalize(path))
             .headers(self.auth_header())
+            .send()?;
+
+        Error::map_http_code(response)
+    }
+
+    pub fn post(&self, path: &str, payload: &Value) -> Result<Response> {
+        let response = Client::new()
+            .post(&self.normalize(path))
+            .headers(self.auth_header())
+            .json(payload)
             .send()?;
 
         Error::map_http_code(response)

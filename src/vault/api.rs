@@ -80,4 +80,28 @@ impl VaultApi {
             }
         }
     }
+
+    pub fn enable_approle(&self) -> Painted<String> {
+        let path = format!("sys/auth/approle");
+        let payload = json!({"type": "approle"});
+        let response = self.http_client.post(&path, &payload);
+        match response {
+            Ok(mut r) => {
+
+                match r.json::<Value>() {
+                    Ok(v) => {
+                        paint_success(format!("{:#}", JsonExtractor::new(&v)
+                            .get_value("data")
+                            .get_str("keys")))
+                    },
+                    Err(e) => {
+                        paint_success(e.to_string())
+                    },
+                }
+            },
+            Err(e) => {
+                paint_error(e.to_string())
+            },
+        }
+    }
 }
