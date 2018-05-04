@@ -1,8 +1,6 @@
-extern crate colored;
 extern crate reqwest;
 extern crate rpassword;
 extern crate rustyline;
-
 #[macro_use]
 extern crate serde_json;
 extern crate term_painter;
@@ -16,6 +14,7 @@ use vault::http_client::VaultHTTPClient;
 
 mod shell;
 mod json_extractor;
+
 mod vault;
 mod cli;
 mod errors;

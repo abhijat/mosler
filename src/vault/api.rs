@@ -14,18 +14,12 @@ impl VaultApi {
     }
 
     pub fn probe(&self) -> Result<String, String> {
-        self.http_client.get("sys/health")
-            .map_err(|e| e.to_string())?
-            .json::<Value>()
-            .map_err(|e| e.to_string())
+        try_get_json!(self.http_client.get("sys/health"))
             .map(|v| format!("{:#}", v))
     }
 
     pub fn get_policies(&self) -> Result<String, String> {
-        self.http_client.get("sys/policy")
-            .map_err(|e| e.to_string())?
-            .json::<Value>()
-            .map_err(|e| e.to_string())
+        try_get_json!(self.http_client.get("sys/policy"))
             .map(|v| format!("{:#}", JsonExtractor::new(&v)
                 .get_value("data")
                 .get_value("policies")
@@ -33,10 +27,7 @@ impl VaultApi {
     }
 
     pub fn get_app_roles(&self) -> Result<String, String> {
-        self.http_client.method("auth/approle/role", "LIST")
-            .map_err(|e| e.to_string())?
-            .json::<Value>()
-            .map_err(|e| e.to_string())
+        try_get_json!(self.http_client.method("auth/approle/role", "LIST"))
             .map(|v| format!("{:#}", JsonExtractor::new(&v)
                 .get_value("data")
                 .get_str("keys")))
@@ -44,10 +35,7 @@ impl VaultApi {
 
     pub fn read_policy(&self, policy_name: &str) -> Result<String, String> {
         let path = format!("sys/policy/{}", policy_name);
-        self.http_client.get(&path)
-            .map_err(|e| e.to_string())?
-            .json::<Value>()
-            .map_err(|e| e.to_string())
+        try_get_json!(self.http_client.get(&path))
             .map(|v| format!("rules: {:#}", JsonExtractor::new(&v)
                 .get_value("data")
                 .get_str("rules")))
