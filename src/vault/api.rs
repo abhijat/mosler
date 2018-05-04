@@ -4,6 +4,7 @@ use vault::http_client::VaultHTTPClient;
 use term_painter::Painted;
 use cli::colors::paint_error;
 use cli::colors::paint_success;
+use utils::http_utils::empty;
 
 #[derive(Debug)]
 pub struct VaultApi {
@@ -82,11 +83,19 @@ impl VaultApi {
     }
 
     pub fn enable_approle(&self) -> Painted<String> {
+
         let path = format!("sys/auth/approle");
+
         let payload = json!({"type": "approle"});
+
         let response = self.http_client.post(&path, &payload);
+
         match response {
             Ok(mut r) => {
+                if empty(&r) {
+                    let string = format!("{}", r.status());
+                    return paint_success(string);
+                }
 
                 match r.json::<Value>() {
                     Ok(v) => {

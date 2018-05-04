@@ -19,6 +19,7 @@ mod json_extractor;
 mod vault;
 mod cli;
 mod errors;
+mod utils;
 
 fn read_input() -> AuthContext {
     let mut server = String::new();
