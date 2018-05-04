@@ -4,6 +4,7 @@ use rustyline::config::{Builder, CompletionType};
 use rustyline::Editor;
 use rustyline::error::ReadlineError;
 use vault::api::VaultApi;
+use cli::colors::paint;
 
 fn init_readline() -> Editor<CommandCompleter> {
     let builder = Builder::new()
@@ -27,9 +28,9 @@ pub fn shell(api: VaultApi) {
         match input {
             Ok(s) => {
                 if !s.is_empty() {
-                    rl.add_history_entry(s.clone());
+                    rl.add_history_entry(s.to_owned());
                     let response = command_router(&api, &s);
-                    println!("{}", response);
+                    println!("{}", paint(response));
                 }
             }
 

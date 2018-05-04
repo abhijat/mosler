@@ -1,10 +1,7 @@
 use json_extractor::JsonExtractor;
 use serde_json::Value;
-use vault::http_client::VaultHTTPClient;
-use term_painter::Painted;
-use cli::colors::paint_error;
-use cli::colors::paint_success;
 use utils::http_utils::empty;
+use vault::http_client::VaultHTTPClient;
 
 #[derive(Debug)]
 pub struct VaultApi {
@@ -26,91 +23,55 @@ impl VaultApi {
                 Err(e.to_string())
             }
         }
-
     }
 
-    pub fn get_policies(&self) -> Painted<String> {
-        let response = self.http_client.get("sys/policy");
-
-        match response {
-            Ok(mut r) => {
-                let v: Value = r.json().unwrap();
-                paint_success(format!("{:#}", JsonExtractor::new(&v)
-                    .get_value("data")
-                    .get_value("policies")
-                    .value_ref))
-            }
-
-            Err(e) => {
-                paint_error(e.to_string())
-            }
-        }
+    pub fn get_policies(&self) -> Result<String, String> {
+        self.http_client.get("sys/policy")
+            .map_err(|e| e.to_string())?
+            .json::<Value>()
+            .map_err(|e| e.to_string())
+            .map(|v| format!("{:#}", JsonExtractor::new(&v)
+                .get_value("data")
+                .get_value("policies")
+                .value_ref))
     }
 
-    pub fn get_app_roles(&self) -> Painted<String> {
-        let response = self.http_client.method("auth/approle/role", "LIST");
-
-        match response {
-            Ok(mut r) => {
-                let v: Value = r.json().unwrap();
-                paint_success(format!("{:#}", JsonExtractor::new(&v)
-                    .get_value("data")
-                    .get_str("keys")))
-            }
-
-            Err(e) => {
-                paint_error(e.to_string())
-            }
-        }
+    pub fn get_app_roles(&self) -> Result<String, String> {
+        self.http_client.method("auth/approle/role", "LIST")
+            .map_err(|e| e.to_string())?
+            .json::<Value>()
+            .map_err(|e| e.to_string())
+            .map(|v| format!("{:#}", JsonExtractor::new(&v)
+                .get_value("data")
+                .get_str("keys")))
     }
 
-    pub fn read_policy(&self, policy_name: &str) -> Painted<String> {
+    pub fn read_policy(&self, policy_name: &str) -> Result<String, String> {
         let path = format!("sys/policy/{}", policy_name);
-        let response = self.http_client.get(&path);
-
-        match response {
-            Ok(mut r) => {
-                let v: Value = r.json().unwrap();
-                paint_success(format!("rules: {:#}", JsonExtractor::new(&v)
-                    .get_value("data")
-                    .get_str("rules")))
-            }
-
-            Err(e) => {
-                paint_error(e.to_string())
-            }
-        }
+        self.http_client.get(&path)
+            .map_err(|e| e.to_string())?
+            .json::<Value>()
+            .map_err(|e| e.to_string())
+            .map(|v| format!("rules: {:#}", JsonExtractor::new(&v)
+                .get_value("data")
+                .get_str("rules")))
     }
 
-    pub fn enable_approle(&self) -> Painted<String> {
-
+    pub fn enable_approle(&self) -> Result<String, String> {
         let path = format!("sys/auth/approle");
-
         let payload = json!({"type": "approle"});
 
-        let response = self.http_client.post(&path, &payload);
+        let mut response = self.http_client.post(&path, &payload)
+            .map_err(|e| e.to_string())?;
 
-        match response {
-            Ok(mut r) => {
-                if empty(&r) {
-                    let string = format!("{}", r.status());
-                    return paint_success(string);
-                }
-
-                match r.json::<Value>() {
-                    Ok(v) => {
-                        paint_success(format!("{:#}", JsonExtractor::new(&v)
-                            .get_value("data")
-                            .get_str("keys")))
-                    },
-                    Err(e) => {
-                        paint_success(e.to_string())
-                    },
-                }
-            },
-            Err(e) => {
-                paint_error(e.to_string())
-            },
+        if empty(&response) {
+            return Ok(format!("{}", response.status()));
         }
+
+        response.json::<Value>()
+            .map_err(|e| e.to_string())
+            .map(|v| format!("{:#}", JsonExtractor::new(&v)
+                .get_value("data")
+                .get_str("keys")))
     }
 }
