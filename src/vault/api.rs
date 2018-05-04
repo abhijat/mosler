@@ -14,15 +14,11 @@ impl VaultApi {
     }
 
     pub fn probe(&self) -> Result<String, String> {
-        match self.http_client.get("sys/health") {
-            Ok(mut r) => {
-                let v: Value = r.json().unwrap();
-                Ok(format!("{:#}", v))
-            }
-            Err(e) => {
-                Err(e.to_string())
-            }
-        }
+        self.http_client.get("sys/health")
+            .map_err(|e| e.to_string())?
+            .json::<Value>()
+            .map_err(|e| e.to_string())
+            .map(|v| format!("{:#}", v))
     }
 
     pub fn get_policies(&self) -> Result<String, String> {

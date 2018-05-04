@@ -13,6 +13,7 @@ Commands that work right now:
 * ls-policies
 * ls-approles
 * read-policy <policy-name>
+* enable-approle 
 
 
 ##### Dependencies
