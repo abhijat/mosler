@@ -1,5 +1,5 @@
 use errors::Error;
-use serde_json::Value;
+use serde_json::{Map, Value};
 use utils::http_utils::empty;
 use utils::json_utils::*;
 use vault::http_client::VaultHTTPClient;
@@ -40,7 +40,7 @@ impl VaultApi {
     pub fn read_policy(&self, policy_name: &str) -> Result<String, String> {
         let path = format!("sys/policy/{}", policy_name);
         let v = Self::parse_json(self.http_client.get(&path))?;
-        
+
         let s = get_string_from_path(&v, &vec!["data", "rules"])?;
         Ok(format!("rules: {:#}", s))
     }
@@ -50,6 +50,41 @@ impl VaultApi {
         let payload = json!({"type": "approle"});
 
         let mut response = self.http_client.post(&path, &payload)
+            .map_err(|e| e.to_string())?;
+
+        if empty(&response) {
+            return Ok(format!("{}", response.status()));
+        }
+
+        let v = response.json::<Value>()
+            .map_err(|e| e.to_string())?;
+
+        let s = get_string_from_path(&v, &vec!["data", "keys"])?;
+        Ok(format!("{:#}", s))
+    }
+
+    pub fn write_secret(&self, command: &[&str]) -> Result<String, String> {
+        let secret_path = command[1];
+        let secret_path = format!("secret/{}", secret_path);
+
+        let mut payload = Map::new();
+
+        command.iter().skip(2).for_each(|k| {
+            eprintln!("k = {:?}", k);
+
+            let v: Vec<&str> = k.split('=').collect();
+
+            let key = v[0];
+            let value: String = v.iter().skip(1).map(|s| *s).collect();
+
+            payload.insert(key.to_owned(), json!(value));
+        });
+
+        let payload = json!(payload);
+
+        eprintln!("payload = {:#}", payload);
+
+        let mut response = self.http_client.post(&secret_path, &payload)
             .map_err(|e| e.to_string())?;
 
         if empty(&response) {

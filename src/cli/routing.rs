@@ -9,6 +9,7 @@ fn route_command_with_args(api: &VaultApi, command: &str) -> Result<String, Stri
 
     match tokens[0] {
         "read-policy" => api.read_policy(tokens[1]),
+        "write-secret" => api.write_secret(&tokens),
         _ => Err("unknown command".to_owned())
     }
 }

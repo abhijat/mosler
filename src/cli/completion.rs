@@ -9,7 +9,8 @@ impl CommandCompleter {
             "ls-policies".to_owned(),
             "ls-approles".to_owned(),
             "read-policy".to_owned(),
-            "enable-approle".to_owned()
+            "enable-approle".to_owned(),
+            "write-secret".to_owned(),
         ]
     }
 }
