@@ -13,8 +13,6 @@ use vault::auth_context::ContextBuilder;
 use vault::http_client::VaultHTTPClient;
 
 mod shell;
-mod json_extractor;
-
 mod vault;
 mod cli;
 mod errors;
